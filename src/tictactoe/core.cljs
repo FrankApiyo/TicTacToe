@@ -8,13 +8,22 @@
   (vec (repeat n (vec (repeat n "B")))))
 
 (defonce app-state (atom {:text "Hello world!"
-                          :board (new-board 3)}))
+                          :board (new-board 10)}))
 
+(def board-size 10)
 
-(prn (:board @app-state))
-
-(defn compute-move []
-  (swap! app-state assoc-in [:board 0 0 ] "C"))
+(defn computer-move []
+  (let [board (:board @app-state)
+        remaining-spots (for [i (range board-size)
+                              j (range board-size)
+                              :when (= (get-in board [j i]) "B")]
+                          [i j])
+        _ (print remaining-spots)
+        move (rand-nth remaining-spots)
+        path (into [:board] (reverse move))]
+    (print move)
+    (print path)
+    (swap! app-state assoc-in path "C")))
 
 (defn blank [i j]
 [:rect {:width 0.9
@@ -26,7 +35,7 @@
         (fn react-click [e]
           (prn "You clicked me!")
           (swap! app-state assoc-in [:board j i] "P")
-          (compute-move))}])
+          (computer-move))}])
 
 (defn circle [i j]
   [:circle 
@@ -50,11 +59,11 @@
   [:center
    [:h1 (:text @app-state)]
    [:svg
-    {:view-box "0 0 3 3"
+    {:view-box (str "0 0 " board-size " " board-size)
      :width 500
      :height 500}
-    (for [i (range (count (:board @app-state)))
-          j (range (count (:board @app-state)))]
+    (for [i (range board-size)
+          j (range board-size)]
       (case (get-in @app-state [:board j i])
         "B" [blank i j]
         "P" [circle i j]
@@ -73,5 +82,5 @@
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
   ; (swap! app-state assoc-in [:text] "Hi")
-  (prn (:board @app-state))
+  (print (deref app-state))
   )
