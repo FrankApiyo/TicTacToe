@@ -5,16 +5,16 @@
 
 ;; define your app data so that it doesn't get over-written on reload
 (defn new-board [n]
-  (vec (repeat n (vec (repeat n 0)))))
+  (vec (repeat n (vec (repeat n "B")))))
 
 (defonce app-state (atom {:text "Hello world!"
                           :board (new-board 3)}))
 
 
-; (prn (:board @app-state))
+(prn (:board @app-state))
 
 (defn compute-move []
-  (swap! app-state assoc-in [:board 0 0 ] 2))
+  (swap! app-state assoc-in [:board 0 0 ] "C"))
 
 (defn blank [i j]
 [:rect {:width 0.9
@@ -25,7 +25,7 @@
         :on-click
         (fn react-click [e]
           (prn "You clicked me!")
-          (swap! app-state update-in [:board j i] inc)
+          (swap! app-state assoc-in [:board j i] "P")
           (compute-move))}])
 
 (defn circle [i j]
@@ -56,9 +56,9 @@
     (for [i (range (count (:board @app-state)))
           j (range (count (:board @app-state)))]
       (case (get-in @app-state [:board j i])
-        0 [blank i j]
-        1 [circle i j]
-        2 [cross i j]))]
+        "B" [blank i j]
+        "P" [circle i j]
+        "C" [cross i j]))]
    [:p [:button
         {:on-click
          (fn new-game-click [e]
@@ -73,5 +73,5 @@
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
   ; (swap! app-state assoc-in [:text] "Hi")
-  (swap! app-state assoc-in [:board 0 0] 2)
+  (prn (:board @app-state))
   )
